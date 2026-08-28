@@ -1,17 +1,16 @@
 name: Check Marukyu Koyamaen Stock
 
 on:
-  # 改成每 5 分鐘執行一次
   schedule:
     - cron: '*/5 * * * *' 
   
-  # 允許手動從 GitHub 介面觸發測試
   workflow_dispatch:
 
 jobs:
   check-stock:
     runs-on: ubuntu-latest
     steps:
+      # 如果有更新的版本可以這樣寫，或是直接保留原本的 v4/v5 即可
       - name: Checkout repository
         uses: actions/checkout@v4
 
