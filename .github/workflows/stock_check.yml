@@ -1,0 +1,31 @@
+name: Check Marukyu Koyamaen Stock
+
+on:
+  # 改成每 5 分鐘執行一次
+  schedule:
+    - cron: '*/5 * * * *' 
+  
+  # 允許手動從 GitHub 介面觸發測試
+  workflow_dispatch:
+
+jobs:
+  check-stock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run script
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+        run: |
+          python check_stock.py
