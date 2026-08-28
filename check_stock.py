@@ -70,7 +70,7 @@ def check_product_stock():
       print("偵測到商品有貨，準備發送 LINE 通知...")
       send_line_message(message)
     else:
-      print("目前商品仍處於缺貨狀態（已嚴格過濾大小寫與按鈕）。")
+      print("目前商品仍處於缺貨狀態。")
 
   except Exception as e:
     print(f"發生錯誤：{e}")
