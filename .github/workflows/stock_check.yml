@@ -10,7 +10,6 @@ jobs:
   check-stock:
     runs-on: ubuntu-latest
     steps:
-      # 如果有更新的版本可以這樣寫，或是直接保留原本的 v4/v5 即可
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -25,6 +24,7 @@ jobs:
 
       - name: Run script
         env:
-          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+          LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
         run: |
           python check_stock.py
