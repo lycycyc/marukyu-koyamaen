@@ -2,6 +2,7 @@ import os
 from bs4 import BeautifulSoup
 import requests
 
+# 設定要追蹤的丸久小山園商品網址
 URL = "https://www.marukyu-koyamaen.co.jp/english/shop/products/1171020c1"
 LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
 LINE_USER_ID = os.environ.get("LINE_USER_ID")
@@ -25,6 +26,7 @@ def send_line_message(message):
   response = requests.post(
       "https://api.line.me/v2/bot/message/push", headers=headers, json=data
   )
+
   if response.status_code == 200:
     print("LINE 訊息發送成功！")
   else:
@@ -48,25 +50,27 @@ def check_product_stock():
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    # 檢查網頁中是否有 WooCommerce 的加入購物車按鈕 (通常有 .single_add_to_cart_button)
-    # 或者直接檢查網頁文字是否包含明確的「有貨」訊號，並排除缺貨狀態
-    
-    # 找尋加入購物車按鈕
-    add_to_cart_btn = soup.select_one(".single_add_to_cart_button")
-    
-    # 同時檢查網頁上常見的缺貨字眼
-    page_text = soup.get_text()
-    is_out_of_stock = "Out of stock" in page_text or "Sold out" in page_text
+    # 1. 取得網頁所有文字並轉為小寫，徹底解決大小寫差異問題
+    page_text = soup.get_text().lower()
 
-    # 判斷邏輯：必須「有加入購物車按鈕」且「沒有出現缺貨字眼」，才代表真的有貨！
+    # 2. 定義常見的缺貨關鍵字（全部小寫）
+    out_of_stock_keywords = [
+        "out of stock",
+        "sold out",
+        "temporarily unavailable",
+    ]
+    is_out_of_stock = any(kw in page_text for kw in out_of_stock_keywords)
+
+    # 3. 檢查是否有 WooCommerce 的「加入購物車」按鈕
+    add_to_cart_btn = soup.select_one(".single_add_to_cart_button")
+
+    # 4. 判斷邏輯：必須「有加入購物車按鈕」且「完全沒有出現缺貨字眼」
     if add_to_cart_btn and not is_out_of_stock:
-      message = (
-          f"🎉 丸久小山園商品確定補貨了！\n請盡快前往搶購：\n{URL}"
-      )
+      message = f"🎉 丸久小山園商品確定補貨了！\n請盡快前往搶購：\n{URL}"
       print("偵測到商品有貨，準備發送 LINE 通知...")
       send_line_message(message)
     else:
-      print("目前商品仍處於缺貨狀態（未檢測到購買按鈕或顯示缺貨）。")
+      print("目前商品仍處於缺貨狀態（已嚴格過濾大小寫與按鈕）。")
 
   except Exception as e:
     print(f"發生錯誤：{e}")
