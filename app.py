@@ -55,9 +55,7 @@ def check_stock():
                 continue
 
             is_out = any(kw in BeautifulSoup(res.text, "html.parser").get_text() for kw in item["out_keywords"])
-            status = "OUT_OF_STOCK"
-            if is_out
-            else "IN_STOCK"
+            status = "OUT_OF_STOCK" if is_out else "IN_STOCK"
             
             if not is_out:
                 in_stock.append(f"🎉 {item['name']}\n\n{item['url']}")
