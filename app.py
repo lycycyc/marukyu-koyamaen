@@ -1,5 +1,6 @@
 import os
 from bs4 import BeautifulSoup
+import cloudscraper
 from flask import Flask, jsonify
 import requests
 
@@ -31,7 +32,6 @@ TARGET_PRODUCTS = [
     },
 ]
 
-
 def send_line_message(message):
   if not LINE_ACCESS_TOKEN or not LINE_USER_ID:
     print("未設定 LINE Token 或 User ID")
@@ -50,18 +50,12 @@ def send_line_message(message):
   )
   return response.status_code
 
-
 @app.route("/")
 @app.route("/check")
 def check_stock():
-  # 模擬更完整的瀏覽器 Header，降低被擋機率
-  headers = {
-      "User-Agent": (
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,"
-          " like Gecko) Chrome/122.0.0.0 Safari/537.36"
-      ),
-      "Accept-Language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-  }
+  scraper = cloudscraper.create_scraper(
+      browser={"browser": "chrome", "platform": "windows", "desktop": True}
+  )
 
   results = []
   in_stock_products = []
@@ -72,9 +66,8 @@ def check_stock():
     out_keywords = item["out_keywords"]
 
     try:
-      response = requests.get(url, headers=headers, timeout=10)
+      response = scraper.get(url, timeout=15)
 
-      # 防護 1：如果網站回傳 403/429/500 等錯誤碼，不要誤判為有貨
       if response.status_code != 200:
         results.append({
             "name": product_name,
@@ -84,10 +77,10 @@ def check_stock():
         continue
 
       soup = BeautifulSoup(response.text, "html.parser")
-      page_text = soup.get_text().lower()
+      
+      page_text = soup.get_text()
 
-      # 防護 2：檢查是否包含缺貨關鍵字
-      is_out_of_stock = any(kw.lower() in page_text for kw in out_keywords)
+      is_out_of_stock = any(kw in page_text for kw in out_keywords)
 
       if not is_out_of_stock:
         status = "IN_STOCK"
@@ -105,13 +98,10 @@ def check_stock():
       )
 
   if in_stock_products:
-    combined_message = "⚠️\n\n" + "\n\n".join(
-        in_stock_products
-    )
+    combined_message = "⚠️\n\n" + "\n\n".join(in_stock_products)
     send_line_message(combined_message)
 
   return jsonify({"checked_count": len(TARGET_PRODUCTS), "details": results}), 200
-
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=5000)
