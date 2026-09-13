@@ -44,6 +44,8 @@ def check_stock():
             send_line_message(message)
             return jsonify({"status": "IN_STOCK", "message": "已發送通知"}), 200
         else:
+            message = f"丸久小山園商品缺貨中！\n{URL}"
+            send_line_message(message)
             return jsonify({"status": "OUT_OF_STOCK", "message": "目前缺貨中"}), 200
 
     except Exception as e:
