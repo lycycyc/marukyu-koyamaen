@@ -10,18 +10,23 @@ LINE_USER_ID = os.environ.get("LINE_USER_ID")
 
 TARGET_PRODUCTS = [
     {
-        "name": "【丸久小山園 又玄】補貨通知！",
+        "name": "【又玄】",
         "url": "https://www.marukyu-koyamaen.co.jp/english/shop/products/1171020c1",
         "out_keywords": ["This product is currently out of stock and unavailable."],
     },
     {
-        "name": "【丸久小山園 五十鈴】補貨通知！",
+        "name": "【五十鈴】",
         "url": "https://www.marukyu-koyamaen.co.jp/english/shop/products/1191040c1",
         "out_keywords": ["This product is currently out of stock and unavailable."],
     },
     {
-        "name": "【丸久小山園 青嵐】補貨通知！",
+        "name": "【青嵐】",
         "url": "https://www.marukyu-koyamaen.co.jp/english/shop/products/11a1040c1",
+        "out_keywords": ["This product is currently out of stock and unavailable."],
+    },
+    {
+        "name": "【焙茶 A】",
+        "url": "https://www.marukyu-koyamaen.co.jp/english/shop/products/1233100c7",
         "out_keywords": ["This product is currently out of stock and unavailable."],
     },
 ]
@@ -58,7 +63,7 @@ def check_stock():
             status = "OUT_OF_STOCK" if is_out else "IN_STOCK"
             
             if not is_out:
-                in_stock.append(f"🎉 {item['name']}\n\n{item['url']}")
+                in_stock.append(f"{item['name']}\n{item['url']}")
 
             results.append({
                 "name": item["name"],
@@ -73,7 +78,7 @@ def check_stock():
             })
 
     if in_stock:
-        send_line_message("⚠️\n\n" + "\n\n".join(in_stock))
+        send_line_message("【丸九小山園】補貨通知\n\n\n\n\n" + "\n\n\n".join(in_stock))
 
     return jsonify({
         "checked_count": len(TARGET_PRODUCTS),
