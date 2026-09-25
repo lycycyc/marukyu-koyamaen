@@ -132,7 +132,7 @@ def check_stock():
         update_github_status(new_status_dict, file_sha)
 
     if in_stock:
-        send_line_message("🍵【丸久小山園】補貨通知\n\n\n\n\n" + "\n\n\n".join(in_stock))
+        send_line_message("🍵 【丸久小山園】補貨通知\n\n\n\n" + "\n\n\n".join(in_stock))
 
     return jsonify({
         "checked_count": len(TARGET_PRODUCTS),
