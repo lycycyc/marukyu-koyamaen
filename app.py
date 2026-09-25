@@ -85,7 +85,7 @@ def update_github_status(new_status_dict, sha):
 @app.route("/")
 @app.route("/check")
 def check_stock():
-    results, in_stock = [], []
+    results, in_stock, out_stock = [], [], []
     
     old_status_dict, file_sha = get_github_status()
     new_status_dict = old_status_dict.copy() if old_status_dict else {}
@@ -112,6 +112,7 @@ def check_stock():
                 in_stock.append(f"{item['name']}\n{item['url']}")
                 status_changed = True
             elif last_status == "IN_STOCK" and current_status == "OUT_OF_STOCK":
+                out_stock.append(f"{item['name']}\n{item['url']}")
                 status_changed = True
 
             new_status_dict[pid] = current_status
@@ -133,6 +134,9 @@ def check_stock():
 
     if in_stock:
         send_line_message("🍵 【丸久小山園】補貨通知\n\n\n\n" + "\n\n\n".join(in_stock))
+
+    if out_stock:
+        send_line_message("🍵 【丸久小山園】售完通知\n\n\n\n" + "\n\n\n".join(out_stock))
 
     return jsonify({
         "checked_count": len(TARGET_PRODUCTS),
