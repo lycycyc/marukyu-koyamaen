@@ -1,6 +1,6 @@
 {
-  "Yugen": "OUT_OF_STOCK",
-  "Isuzu": "OUT_OF_STOCK",
-  "Aoarashi": "OUT_OF_STOCK",
+  "Yugen": "IN_STOCK",
+  "Isuzu": "IN_STOCK",
+  "Aoarashi": "IN_STOCK",
   "Hojicha": "OUT_OF_STOCK"
 }
